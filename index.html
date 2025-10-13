@@ -1,0 +1,605 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Genomics Nutrition Planner</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes float { 0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)} }
+    .animate-float{ animation: float 3s ease-in-out infinite; }
+    @keyframes glow { 0%{filter:drop-shadow(0 0 0 rgba(16,185,129,.6))}50%{filter:drop-shadow(0 0 8px rgba(16,185,129,.8))}100%{filter:drop-shadow(0 0 0 rgba(16,185,129,.6))}}
+    .animate-glow{ animation: glow 2s ease-in-out infinite; }
+    @keyframes fadeIn{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)}}
+    .animate-fade-in{ animation: fadeIn .4s ease forwards; }
+    @keyframes fadeInUp{ from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)}}
+    .animate-fade-in-up{ animation: fadeInUp .5s ease forwards; }
+    @keyframes scaleIn{ from{opacity:0;transform:scale(.98)} to{opacity:1;transform:scale(1)}}
+    .animate-scale-in{ animation: scaleIn .35s ease forwards; }
+    /* Simple toast */
+    #toast{ position:fixed; top:16px; right:16px; z-index:50; }
+    .toast-item{ background:#111827; color:#fff; padding:.75rem 1rem; border-radius:.5rem; margin-top:.5rem; box-shadow:0 10px 15px -3px rgba(0,0,0,.1); }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; border-radius:.5rem; padding:.6rem 1rem; font-weight:600; }
+    .btn-primary{ background:#0ea5e9; color:#fff; }
+    .btn-primary:hover{ filter:brightness(.95); }
+    .btn-outline{ border:1px solid #e5e7eb; color:#111827; background:#fff; }
+    .btn-outline:hover{ background:#f9fafb; }
+    .btn-green{ background:linear-gradient(to right,#06b6d4,#22c55e); color:#fff; }
+    .btn-green:hover{ filter:brightness(.95); }
+    .btn-emerald{ background:#10b981; color:#fff; }
+    .btn-emerald:hover{ filter:brightness(.95); }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-white via-white to-slate-50">
+
+  <!-- Toast container -->
+  <div id="toast"></div>
+
+  <!-- Hero -->
+  <div class="relative overflow-hidden bg-gradient-to-r from-cyan-500 via-sky-400 to-emerald-500 py-20 px-4">
+    <div class="absolute inset-0 opacity-20" style="background-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==');"></div>
+    <div class="container mx-auto max-w-4xl text-center relative z-10">
+      <div class="flex items-center justify-center mb-6 animate-fade-in">
+        <!-- DNA icon substitute -->
+        <svg class="w-16 h-16 text-white mr-4 animate-float" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0 2.2-1.96 3.663-4.35 4.725-2.37 1.053-4.65 2.068-4.65 4.188m9-8.913C14.25 3.884 12.29 2.42 9.9 1.358 7.53.305 5.25-.71 5.25-2.83M5.25 15c0 2.2 1.96 3.663 4.35 4.725 2.37 1.053 4.65 2.068 4.65 4.188m-9-8.913c0-2.203 1.96-3.667 4.35-4.729 2.37-1.053 4.65-2.068 4.65-4.187"/></svg>
+        <h1 class="text-5xl md:text-6xl font-bold text-white">Genomics Nutrition Planner</h1>
+      </div>
+      <p class="text-xl text-white/90 max-w-2xl mx-auto mb-8 animate-fade-in-up">
+        Unlock your genetic potential with personalized nutrition recommendations tailored to your unique DNA
+      </p>
+      <div id="hero-start-wrap" class="animate-fade-in-up">
+        <button id="startBtn" class="btn bg-white text-cyan-700 hover:bg-white/90 shadow-xl animate-scale-in gap-2 text-lg px-8 py-3">
+          Start Your Journey
+          <svg class="w-5 h-5 inline -mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info cards (step 0 only) -->
+  <div id="infoSection" class="container mx-auto max-w-6xl px-4 py-16 animate-fade-in-up">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold mb-4">Why Genomics-Based Nutrition?</h2>
+      <p class="text-slate-500 max-w-2xl mx-auto">
+        Traditional nutrition plans use a one-size-fits-all approach. Your genes are unique, and so should be your nutrition plan.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <!-- Reusable card functionally identical content -->
+      <div class="border-2 rounded-xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-white/50">
+        <div class="p-6">
+          <div class="w-12 h-12 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4c4 0 6 2 8 8s4 8 8 8"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">DNA-Driven Insights</h3>
+          <p class="text-slate-500">
+            Understand how your genes affect nutrient metabolism, food sensitivities, and optimal macronutrient ratios
+          </p>
+        </div>
+      </div>
+
+      <div class="border-2 rounded-xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-white/50">
+        <div class="p-6">
+          <div class="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9-7-9-7-9 7 9 7z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Precision Targeting</h3>
+          <p class="text-slate-500">
+            Achieve your health goals faster with nutrition plans optimized for your genetic predispositions
+          </p>
+        </div>
+      </div>
+
+      <div class="border-2 rounded-xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-white/50">
+        <div class="p-6">
+          <div class="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8m-4-4h8"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Disease Prevention</h3>
+          <p class="text-slate-500">
+            Identify genetic risk factors and receive dietary recommendations to reduce disease susceptibility
+          </p>
+        </div>
+      </div>
+
+      <div class="border-2 rounded-xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-white/50">
+        <div class="p-6">
+          <div class="w-12 h-12 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3l-2 2-2-2v7M7 14h10l-5 7-5-7z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Optimized Performance</h3>
+          <p class="text-slate-500">
+            Enhance energy levels, recovery, and athletic performance based on your genetic strengths
+          </p>
+        </div>
+      </div>
+
+      <div class="border-2 rounded-xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-white/50">
+        <div class="p-6">
+          <div class="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21C7 21 3 17 3 12s4-9 9-9 9 4 9 9-4 9-9 9z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Personalized Wellness</h3>
+          <p class="text-slate-500">
+            Discover foods that work best for your body and avoid those that may cause inflammation or intolerance
+          </p>
+        </div>
+      </div>
+
+      <div class="border-2 rounded-xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-white/50">
+        <div class="p-6">
+          <div class="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 12l6-6m-6 6l6 6"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Long-term Results</h3>
+          <p class="text-slate-500">
+            Build sustainable eating habits aligned with your genetic makeup for lasting health benefits
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-2 border-cyan-200 rounded-xl bg-gradient-to-br from-cyan-50 to-emerald-50">
+      <div class="p-6">
+        <h3 class="text-2xl font-semibold text-center mb-4">What You'll Discover</h3>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
+            <svg class="w-5 h-5 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Your caffeine metabolism speed and optimal intake</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
+            <svg class="w-5 h-5 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Vitamin and mineral absorption efficiency</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
+            <svg class="w-5 h-5 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Carbohydrate sensitivity and optimal ratios</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
+            <svg class="w-5 h-5 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Fat metabolism and omega-3 requirements</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
+            <svg class="w-5 h-5 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Lactose and gluten tolerance levels</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
+            <svg class="w-5 h-5 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Antioxidant needs based on oxidative stress genes</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
+            <svg class="w-5 h-5 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Optimal protein intake for muscle synthesis</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/50 transition-colors">
+            <svg class="w-5 h-5 text-cyan-600 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+            <span class="text-sm">Food sensitivities and inflammatory responses</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Steps (hidden until start) -->
+  <div id="stepsWrap" class="hidden">
+    <!-- Progress -->
+    <div class="container mx-auto max-w-4xl px-4 mt-8 animate-fade-in">
+      <div class="flex items-center justify-between mb-8" id="progress">
+        <!-- filled dynamically -->
+      </div>
+    </div>
+
+    <!-- Card -->
+    <div class="container mx-auto max-w-4xl px-4 pb-16">
+      <div class="shadow-xl border-0 bg-white/80 backdrop-blur rounded-xl animate-scale-in">
+        <div class="p-6 border-b">
+          <h2 id="stepTitle" class="text-2xl font-semibold flex items-center gap-2"></h2>
+          <p id="stepDesc" class="text-slate-500"></p>
+        </div>
+        <div class="p-6 space-y-6">
+          <!-- Step 1 -->
+          <div id="step1" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="age" class="font-medium">Age</label>
+              <input id="age" type="number" placeholder="25" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+            </div>
+            <div class="space-y-2">
+              <label for="sex" class="font-medium">Sex</label>
+              <select id="sex" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+                <option value="">Select</option>
+                <option>male</option>
+                <option>female</option>
+                <option>other</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label for="height" class="font-medium">Height (cm)</label>
+              <input id="height" type="number" placeholder="175" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+            </div>
+            <div class="space-y-2">
+              <label for="weight" class="font-medium">Weight (kg)</label>
+              <input id="weight" type="number" placeholder="70" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+            </div>
+            <div class="space-y-2 md:col-span-2">
+              <label for="activity" class="font-medium">Activity Level</label>
+              <select id="activity" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+                <option value="">Select your activity level</option>
+                <option value="sedentary">Sedentary (little or no exercise)</option>
+                <option value="light">Lightly active (1-3 days/week)</option>
+                <option value="moderate">Moderately active (3-5 days/week)</option>
+                <option value="very">Very active (6-7 days/week)</option>
+                <option value="extra">Extra active (physical job + exercise)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="step2" class="hidden space-y-6">
+            <div class="space-y-2">
+              <label for="goal" class="font-medium">Nutrition Goal</label>
+              <select id="goal" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+                <option value="">Select your goal</option>
+                <option value="weight_loss">Weight Loss</option>
+                <option value="muscle_gain">Muscle Gain</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="athletic_performance">Athletic Performance</option>
+                <option value="health_optimization">Health Optimization</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label for="cuisine" class="font-medium">Cuisine Preference</label>
+              <input id="cuisine" placeholder="e.g., Mediterranean, Asian, American" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+            </div>
+            <div class="space-y-2">
+              <label for="diet" class="font-medium">Dietary Preference</label>
+              <select id="diet" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+                <option value="">Select dietary preference</option>
+                <option value="omnivore">Omnivore</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="pescatarian">Pescatarian</option>
+                <option value="keto">Keto</option>
+                <option value="paleo">Paleo</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label for="budget" class="font-medium">Budget Level</label>
+              <select id="budget" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500">
+                <option value="">Select budget level</option>
+                <option value="low">Budget-friendly</option>
+                <option value="medium">Moderate</option>
+                <option value="high">Premium</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label for="constraints" class="font-medium">Dietary Constraints / Allergies</label>
+              <textarea id="constraints" rows="3" placeholder="e.g., lactose intolerant, nut allergy, gluten-free" class="w-full rounded-md border p-2 focus:ring-2 focus:ring-cyan-500"></textarea>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div id="step3" class="hidden">
+            <div class="space-y-4" id="genoList"></div>
+            <div class="flex gap-2">
+              <button id="addVariant" class="btn btn-emerald">Add Variant</button>
+              <button id="uploadCsv" class="btn btn-outline">Upload CSV</button>
+              <input id="csvFile" type="file" accept=".csv,text/csv" class="hidden">
+            </div>
+            <p class="text-slate-500 text-sm mt-2">Add reported variants or upload a CSV/23andMe export (small files).</p>
+          </div>
+
+          <!-- Navigation -->
+          <div class="flex justify-between pt-6 border-t">
+            <button id="prevBtn" class="btn btn-outline gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+              Previous
+            </button>
+            <button id="nextBtn" class="btn btn-primary gap-2">
+              Next
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <button id="generateBtn" class="hidden btn btn-green gap-2">
+              <svg class="w-4 h-4 animate-glow" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3l-2 2-2-2v7M7 14h10l-5 7-5-7z"/></svg>
+              <span id="genText">Generate Plan</span>
+            </button>
+          </div>
+
+          <!-- Backend URL + Results -->
+          <div class="mt-6">
+            <label class="font-medium">Backend URL</label>
+            <input id="backendUrl" class="w-full rounded-md border p-2 mt-1" value="http://localhost:8000/generate-plan">
+          </div>
+          <div class="grid lg:grid-cols-3 gap-6 mt-6">
+            <div class="bg-white border rounded-lg p-4">
+              <h3 class="font-semibold mb-2">Traits</h3>
+              <pre id="traitsBox" class="text-xs bg-slate-50 p-2 rounded max-h-80 overflow-auto"></pre>
+            </div>
+            <div class="bg-white border rounded-lg p-4 lg:col-span-2">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold mb-2">Plan JSON</h3>
+                <div class="space-x-2">
+                  <button id="copyBtn" class="btn btn-outline">Copy</button>
+                  <button id="downloadBtn" class="btn btn-outline">Download</button>
+                </div>
+              </div>
+              <pre id="planBox" class="text-xs bg-slate-50 p-2 rounded max-h-[28rem] overflow-auto"></pre>
+              <div id="status" class="text-sm text-slate-500 mt-2"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <template id="genoRow">
+    <div class="grid md:grid-cols-3 gap-3 p-3 border rounded-lg bg-emerald-50/40">
+      <input placeholder="Gene (e.g., APOA2)" class="gene w-full rounded-md border p-2 focus:ring-2 focus:ring-emerald-500">
+      <input placeholder="rsID (e.g., rs5082)" class="rsid w-full rounded-md border p-2 focus:ring-2 focus:ring-emerald-500">
+      <input placeholder="Genotype (e.g., AA)" class="gt w-full rounded-md border p-2 focus:ring-2 focus:ring-emerald-500">
+      <button class="md:col-span-3 text-red-600 text-sm mt-1 underline remove">Remove</button>
+    </div>
+  </template>
+
+  <script>
+    // Diagnostic: log script load
+    try{ console.log('index.html script loaded'); }catch(e){}
+    // Global error handler to surface errors in the toast UI
+    window.addEventListener('error', function(ev){
+      try{
+        console.error('Unhandled error', ev.error || ev.message, ev);
+        toast('JS Error: ' + (ev.error && ev.error.message ? ev.error.message : ev.message),'error');
+      }catch(e){ console.error(e); }
+    });
+
+    // State
+    let step = 0;
+    const formData = {
+      age: "", sex: "", height_cm: "", weight_kg: "",
+      activity_level: "", goal: "", cuisine_pref: "",
+      dietary_pref: "", budget_level: "", constraints: "",
+      genomics: []
+    };
+    let loading = false;
+
+    // Elements
+    const infoSection = document.getElementById('infoSection');
+    const stepsWrap = document.getElementById('stepsWrap');
+    const startBtn = document.getElementById('startBtn');
+    const progress = document.getElementById('progress');
+    const stepTitle = document.getElementById('stepTitle');
+    const stepDesc = document.getElementById('stepDesc');
+    const s1 = document.getElementById('step1');
+    const s2 = document.getElementById('step2');
+    const s3 = document.getElementById('step3');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const genText = document.getElementById('genText');
+    const genoList = document.getElementById('genoList');
+    const genoTpl = document.getElementById('genoRow').content;
+    const addVariant = document.getElementById('addVariant');
+    const uploadCsv = document.getElementById('uploadCsv');
+    const csvFile = document.getElementById('csvFile');
+
+    // Inputs
+    const ageEl = document.getElementById('age');
+    const sexEl = document.getElementById('sex');
+    const heightEl = document.getElementById('height');
+    const weightEl = document.getElementById('weight');
+    const activityEl = document.getElementById('activity');
+    const goalEl = document.getElementById('goal');
+    const cuisineEl = document.getElementById('cuisine');
+    const dietEl = document.getElementById('diet');
+    const budgetEl = document.getElementById('budget');
+    const constraintsEl = document.getElementById('constraints');
+    const backendUrlEl = document.getElementById('backendUrl');
+
+    // Output
+    const traitsBox = document.getElementById('traitsBox');
+    const planBox = document.getElementById('planBox');
+    const statusEl = document.getElementById('status');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    // Toast
+    function toast(msg, type='info'){
+      const container = document.getElementById('toast');
+      const el = document.createElement('div');
+      el.className = 'toast-item';
+      el.style.background = type === 'error' ? '#b91c1c' : (type === 'success' ? '#065f46' : '#111827');
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(()=> el.remove(), 3000);
+    }
+
+    // UI helpers
+    function updateProgress(){
+      progress.innerHTML = '';
+      [1,2,3].forEach((s, idx)=>{
+        const wrap = document.createElement('div');
+        wrap.className = 'flex items-center flex-1';
+        const bubble = document.createElement('div');
+        bubble.className = 'w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-500 ' +
+          (step >= s ? 'bg-cyan-600 text-white shadow-lg scale-110' : 'bg-slate-200 text-slate-500');
+        bubble.textContent = s;
+        wrap.appendChild(bubble);
+        if(s < 3){
+          const bar = document.createElement('div');
+          bar.className = 'flex-1 h-1 mx-2 rounded transition-all duration-700 ' + (step > s ? 'bg-cyan-600' : 'bg-slate-200');
+          wrap.appendChild(bar);
+        }
+        progress.appendChild(wrap);
+      });
+      if(step === 1){
+        stepTitle.innerHTML = '<span class="text-cyan-600">Personal Information</span>';
+        stepDesc.textContent = 'Tell us about your basic information';
+      } else if(step === 2){
+        stepTitle.innerHTML = '<span class="text-emerald-600">Goals & Preferences</span>';
+        stepDesc.textContent = 'Share your nutrition goals and preferences';
+      } else if(step === 3){
+        stepTitle.innerHTML = '<span class="text-rose-600">Genomics Data</span>';
+        stepDesc.textContent = 'Add your genetic information for personalized recommendations';
+      }
+    }
+
+    function showStep(){
+      s1.classList.add('hidden');
+      s2.classList.add('hidden');
+      s3.classList.add('hidden');
+      nextBtn.classList.remove('hidden');
+      generateBtn.classList.add('hidden');
+      if(step === 1){ s1.classList.remove('hidden'); }
+      if(step === 2){ s2.classList.remove('hidden'); }
+      if(step === 3){ s3.classList.remove('hidden'); nextBtn.classList.add('hidden'); generateBtn.classList.remove('hidden'); }
+      prevBtn.disabled = step === 1;
+      updateProgress();
+    }
+
+    // Genomics rows
+    function addGenoRow(gene='', rsid='', gt=''){
+      const node = document.importNode(genoTpl, true);
+      node.querySelector('.gene').value = gene;
+      node.querySelector('.rsid').value = rsid;
+      node.querySelector('.gt').value = gt;
+      node.querySelector('.remove').addEventListener('click', (e)=> e.target.closest('.grid').remove());
+      genoList.appendChild(node);
+    }
+
+    // CSV parsing (very simple CSV with headers: gene,rsid,genotype)
+    function parseCsv(text){
+      const rows = text.trim().split(/\r?\n/);
+      const header = rows.shift().split(',').map(s=>s.trim().toLowerCase());
+      const gi = header.indexOf('gene'), ri = header.indexOf('rsid'), ti = header.indexOf('genotype');
+      if(gi<0 || ri<0 || ti<0){ toast('CSV must include gene, rsid, genotype headers','error'); return; }
+      rows.forEach(line=>{
+        if(!line.trim()) return;
+        const cols = line.split(',').map(s=>s.trim());
+        addGenoRow(cols[gi]||'', cols[ri]||'', cols[ti]||'');
+      });
+    }
+
+    // Collect form into formData
+    function collectForm(){
+      formData.age = ageEl.value.trim();
+      formData.sex = sexEl.value.trim();
+      formData.height_cm = heightEl.value.trim();
+      formData.weight_kg = weightEl.value.trim();
+      formData.activity_level = activityEl.value.trim();
+      formData.goal = goalEl.value.trim();
+      formData.cuisine_pref = cuisineEl.value.trim();
+      formData.dietary_pref = dietEl.value.trim();
+      formData.budget_level = budgetEl.value.trim();
+      formData.constraints = constraintsEl.value.trim();
+      formData.genomics = Array.from(genoList.children).map(row => ({
+        gene: row.querySelector('.gene').value.trim(),
+        rsid: row.querySelector('.rsid').value.trim(),
+        genotype: row.querySelector('.gt').value.trim()
+      })).filter(v => v.gene && v.rsid && v.genotype);
+    }
+
+    // Submit
+    async function handleSubmit(){
+      collectForm();
+      if(formData.genomics.length === 0){
+        toast('Add at least one variant','error'); return;
+      }
+      const BACKEND_URL = backendUrlEl.value.trim() || 'http://localhost:8000/generate-plan';
+      loading = true;
+      genText.textContent = 'Processing...';
+      statusEl.textContent = 'Sending request...';
+      try{
+        const payload = {
+          age: Number(formData.age||0),
+          sex: formData.sex,
+          height_cm: Number(formData.height_cm||0),
+          weight_kg: Number(formData.weight_kg||0),
+          activity_level: formData.activity_level,
+          goal: formData.goal,
+          cuisine_pref: formData.cuisine_pref || 'Indian',
+          dietary_pref: formData.dietary_pref || 'flexitarian',
+          budget_level: formData.budget_level || 'medium',
+          constraints: (formData.constraints||'').split(',').map(s=>s.trim()).filter(Boolean),
+          genomics: formData.genomics
+        };
+        const res = await fetch(BACKEND_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok){
+          const t = await res.text();
+          statusEl.textContent = 'Error: ' + t;
+          toast('Failed to generate nutrition plan','error');
+          return;
+        }
+        const data = await res.json();
+        // Expect { traits: {...}, plan_text: "<JSON string from model>" }
+        traitsBox.textContent = JSON.stringify(data.traits||{}, null, 2);
+        planBox.textContent = (data.plan_text||'').trim();
+        statusEl.textContent = 'Done.';
+        toast('Your personalized nutrition plan is ready!','success');
+      }catch(e){
+        statusEl.textContent = 'Request failed: ' + e.message;
+        toast('Failed to generate nutrition plan. Please try again.','error');
+      }finally{
+        loading = false;
+        genText.textContent = 'Generate Plan';
+      }
+    }
+
+    // Copy / Download
+    document.getElementById('copyBtn').addEventListener('click', async ()=>{
+      const text = planBox.textContent || '';
+      if(!text.trim()){ toast('Nothing to copy','error'); return; }
+      await navigator.clipboard.writeText(text);
+      toast('Plan JSON copied','success');
+    });
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{
+      const text = planBox.textContent || '';
+      if(!text.trim()){ toast('Nothing to download','error'); return; }
+      const blob = new Blob([text], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'genomics_plan.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    // Events
+    startBtn.addEventListener('click', ()=>{
+      try{
+        console.log('Start button clicked');
+        toast('Starting journey...','success');
+        step = 1;
+        document.getElementById('hero-start-wrap').classList.add('hidden');
+        infoSection.classList.add('hidden');
+        stepsWrap.classList.remove('hidden');
+        addGenoRow(); // start with one row later in step 3
+        showStep();
+      }catch(e){
+        console.error('Start handler error', e); toast('Start handler error: '+e.message,'error');
+      }
+    });
+    prevBtn.addEventListener('click', ()=>{ if(step>1){ step--; showStep(); }});
+    nextBtn.addEventListener('click', ()=>{ if(step<3){ step++; showStep(); }});
+    generateBtn.addEventListener('click', handleSubmit);
+    addVariant.addEventListener('click', ()=> addGenoRow());
+    uploadCsv.addEventListener('click', ()=> csvFile.click());
+    csvFile.addEventListener('change', async (e)=>{
+      const file = (e.target.files && e.target.files[0]) || null;
+      if(!file) return;
+      const text = await file.text();
+      parseCsv(text);
+      toast('CSV variants added','success');
+      csvFile.value = '';
+    });
+
+    // Initial progress render (hidden until step 1)
+    updateProgress();
+  </script>
+</body>
+</html>
